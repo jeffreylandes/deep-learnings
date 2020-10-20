@@ -1,14 +1,11 @@
-import torch
 from torch.nn import (
     BatchNorm2d,
     Conv2d,
     ConvTranspose2d,
     LeakyReLU,
-    MaxPool2d,
     Module,
     ReLU,
     Sequential,
-    functional,
 )
 
 
