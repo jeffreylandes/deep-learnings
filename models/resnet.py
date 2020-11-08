@@ -1,4 +1,4 @@
-from layers import CNNBlock, ResBlock
+from models.layers import CNNBlock, ResBlock
 from torch.nn import Sequential, Module, MaxPool2d, Conv2d, ReLU
 
 
