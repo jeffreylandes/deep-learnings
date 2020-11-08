@@ -12,6 +12,7 @@ class DenseBlock(Module):
                  kernel,
                  stride,
                  padding,
+                 pooling,
                  relu=ReLU(),
                  k=4):
         super(DenseBlock, self).__init__()
@@ -28,7 +29,7 @@ class DenseBlock(Module):
 
         self.convolution_pooling = Sequential(
             Conv2d(out_channels, final_out_channels, kernel, padding),
-            MaxPool2d(2, 2)
+            MaxPool2d(pooling, pooling)
         )
 
     def forward(self, x):
@@ -57,7 +58,8 @@ class DenseNet(Module):
             final_out_channels=16,
             kernel=3,
             stride=1,
-            padding=1
+            padding=1,
+            pooling=3
         )
 
         self.dense_block_2 = DenseBlock(
@@ -66,7 +68,8 @@ class DenseNet(Module):
             final_out_channels=32,
             kernel=3,
             stride=1,
-            padding=1
+            padding=1,
+            pooling=3
         )
 
         self.dense_block_3 = DenseBlock(
@@ -75,11 +78,12 @@ class DenseNet(Module):
             final_out_channels=64,
             kernel=3,
             stride=1,
-            padding=1
+            padding=1,
+            pooling=2
         )
 
         self.linear = Sequential(
-            Linear(1024, 64),
+            Linear(9 * 9 * 64, 64),
             ReLU(),
             Linear(64, 8),
             ReLU(),
@@ -91,6 +95,7 @@ class DenseNet(Module):
         x = self.dense_block_1(x)
         x = self.dense_block_2(x)
         x = self.dense_block_3(x)
+        x = x.view(x.shape[0], -1)
         x = self.linear(x)
         # Think we can return this and do cross-entropy with logits
         return x

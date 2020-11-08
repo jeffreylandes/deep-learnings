@@ -10,7 +10,7 @@ from torch.nn import (
 
 
 class CNNBlock(Module):
-    def __init__(self, in_channels, out_channels, kernel, stride, padding, relu=ReLU):
+    def __init__(self, in_channels, out_channels, kernel, stride, padding, relu=ReLU()):
         super(CNNBlock, self).__init__()
 
         self.cnn_layer = Sequential(
@@ -22,7 +22,7 @@ class CNNBlock(Module):
                 padding=padding,
             ),
             BatchNorm2d(out_channels),
-            relu(),
+            relu,
         )
 
     def forward(self, X):
@@ -39,22 +39,22 @@ class ResBlock(Module):
         super(ResBlock, self).__init__()
 
         self.conv = CNNBlock(
-            in_channels, out_channels, kernel, stride, padding, LeakyReLU
+            in_channels, out_channels, kernel, stride, padding, LeakyReLU()
         )
         self.conv_same_1 = CNNBlock(
-            out_channels, out_channels, kernel, stride, padding, LeakyReLU
+            out_channels, out_channels, kernel, stride, padding, LeakyReLU()
         )
         self.conv_same_2 = CNNBlock(
-            out_channels, out_channels, kernel, stride, padding, LeakyReLU
+            out_channels, out_channels, kernel, stride, padding, LeakyReLU()
         )
         self.conv_same_3 = CNNBlock(
-            out_channels, out_channels, kernel, stride, padding, LeakyReLU
+            out_channels, out_channels, kernel, stride, padding, LeakyReLU()
         )
         self.conv_same_4 = CNNBlock(
-            out_channels, out_channels, kernel, stride, padding, LeakyReLU
+            out_channels, out_channels, kernel, stride, padding, LeakyReLU()
         )
         self.conv_same_5 = CNNBlock(
-            out_channels, out_channels, kernel, stride, padding, LeakyReLU
+            out_channels, out_channels, kernel, stride, padding, LeakyReLU()
         )
         self.up_dims = Sequential(
             ConvTranspose2d(in_channels, out_channels, kernel_size=1, padding=0)

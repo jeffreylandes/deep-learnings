@@ -1,5 +1,5 @@
 from models.layers import CNNBlock, ResBlock
-from torch.nn import Sequential, Module, MaxPool2d, Conv2d, ReLU
+from torch.nn import Sequential, Module, MaxPool2d, Linear, ReLU
 
 
 class ResNet(Module):
@@ -8,11 +8,10 @@ class ResNet(Module):
         super(ResNet, self).__init__()
 
         num_input_channels = kwargs.get("num_input_channels", 3)
-        num_out_channels = kwargs.get("num_out_channels", 1)
 
-        self.first_conv_layer = CNNBlock(num_input_channels, 4, 3, 1, 1)
+        self.first_convolutional_layer = CNNBlock(num_input_channels, 4, 3, 1, 1)
 
-        self.low_conv_down = Sequential(
+        self.residual_layers = Sequential(
             ResBlock(4, 16, 5, 1, 2),
             MaxPool2d(2, 2),
             ResBlock(16, 32, 5, 1, 2),
@@ -20,20 +19,24 @@ class ResNet(Module):
             ResBlock(32, 64, 3, 1, 1),
             MaxPool2d(2, 2),
             ResBlock(64, 128, 3, 1, 1),
+            MaxPool2d(2, 2),
             ResBlock(128, 128, 3, 1, 1),
+            MaxPool2d(2, 2)
         )
 
-        self.res_combine1 = ResBlock(20, 8, 3, 1, 1)
+        self.linear = Sequential(
+            Linear(4608, 64),
+            ReLU(),
+            Linear(64, 8),
+            ReLU(),
+            Linear(8, 1)
+        )
 
-        self.res_combine2 = ResBlock(8, 8, 3, 1, 1)
+    def forward(self, x):
 
-        self.res_final = ResBlock(num_input_channels + 8 + 1, 8, 3, 1, 1)
+        x = self.first_convolutional_layer(x)
+        x = self.residual_layers(x)
+        x = x.view(x.shape[0], -1)
+        x = self.linear(x)
 
-        self.conv_final = Sequential(Conv2d(8, num_out_channels, 3, 1, 1), ReLU())
-
-    def forward(self, x, mask):
-
-        x = self.first_conv_layer_high(x)
-
-        x = self.low_conv_down(x)
-        return x_final
+        return x
